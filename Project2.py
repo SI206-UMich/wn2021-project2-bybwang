@@ -14,8 +14,23 @@ def get_titles_from_search_results(filename):
 
     [('Book title 1', 'Author 1'), ('Book title 2', 'Author 2')...]
     """
+    with open(filename, 'r') as f:
+        soup = BeautifulSoup(f.read(), 'html.parser')
 
-    pass
+    rows = soup.find_all('tr')
+
+    l = []
+    for row in rows:
+        td = row.find_all('td')
+        x = td[1]
+        title = x.find('a', class_='bookTitle').text
+        author = x.find('a', class_='authorName').text
+        title = title.strip()
+        author = author.strip()
+        tup = (title, author)
+        l.append(tup)
+    return l
+
 
 
 def get_search_links():
@@ -32,7 +47,21 @@ def get_search_links():
 
     """
 
-    pass
+    url = "https://www.goodreads.com/search?q=fantasy&qid=NwUsLiA2Nc"
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html.parser')
+
+    rows = soup.find_all('tr')
+
+    l = []
+    for i in range(10):
+        tds = rows[i].find_all('td')
+        link = tds[1].find('a').get('href')
+        link = "https://www.goodreads.com" + link
+        l.append(link)
+        print(link)
+
+    return l
 
 
 def get_book_summary(book_url):
@@ -105,23 +134,25 @@ class TestCases(unittest.TestCase):
 
     def test_get_titles_from_search_results(self):
         # call get_titles_from_search_results() on search_results.htm and save to a local variable
-
+        l = get_titles_from_search_results("search_results.htm")
         # check that the number of titles extracted is correct (20 titles)
-
+        self.assertEqual(len(l), 20)
         # check that the variable you saved after calling the function is a list
-
+        self.assertEqual(type(l), list)
         # check that each item in the list is a tuple
-
+        for i in l:
+            self.assertEqual(type(i), tuple)
         # check that the first book and author tuple is correct (open search_results.htm and find it)
-
+        self.assertEqual(l[0], ('Harry Potter and the Deathly Hallows (Harry Potter, #7)', 'J.K. Rowling'))
         # check that the last title is correct (open search_results.htm and find it)
-
+        self.assertEqual(l[-1], ('Harry Potter: The Prequel (Harry Potter, #0.5)', 'J.K. Rowling'))
     def test_get_search_links(self):
         # check that TestCases.search_urls is a list
-
+        l = get_search_links()
+        self.assertEqual(type(l), list)
         # check that the length of TestCases.search_urls is correct (10 URLs)
 
-
+        
         # check that each URL in the TestCases.search_urls is a string
         # check that each URL contains the correct url for Goodreads.com followed by /book/show/
 
@@ -139,7 +170,7 @@ class TestCases(unittest.TestCase):
             # check that the first two elements in the tuple are string
 
             # check that the third element in the tuple, i.e. pages is an int
-
+        pass
             # check that the first book in the search has 337 pages
 
 
@@ -153,7 +184,7 @@ class TestCases(unittest.TestCase):
             # check that each tuple has a length of 3
 
         # check that the first tuple is made up of the following 3 strings:'Fiction', "The Midnight Library", 'https://www.goodreads.com/choiceawards/best-fiction-books-2020'
-
+        pass
         # check that the last tuple is made up of the following 3 strings: 'Picture Books', 'Antiracist Baby', 'https://www.goodreads.com/choiceawards/best-picture-books-2020'
 
 
@@ -170,7 +201,7 @@ class TestCases(unittest.TestCase):
         # check that the header row is correct
 
         # check that the next row is 'Harry Potter and the Deathly Hallows (Harry Potter, #7)', 'J.K. Rowling'
-
+        pass
         # check that the last row is 'Harry Potter: The Prequel (Harry Potter, #0.5)', 'J.K. Rowling'
 
 
