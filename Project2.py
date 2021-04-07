@@ -4,6 +4,7 @@ import re
 import os
 import csv
 import unittest
+import string
 
 
 def get_titles_from_search_results(filename):
@@ -155,7 +156,30 @@ def extra_credit(filepath):
     Please see the instructions document for more information on how to complete this function.
     You do not have to write test cases for this function.
     """
-    pass
+    
+    r = requests.get(filepath)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    col = soup.find('div', class_='last col')
+    col = col.find('div', id='descriptionContainer')
+    div = col.find('div', class_='readable stacked')
+    spans = div.find_all('span')
+    span = spans[1]
+    desc = span.text
+
+    exp = '[A-Z]\w\w\w+ (?:[A-Z]\w*\W(?:\d*)?)+'
+
+    l = re.findall(exp, desc)
+    ret = []
+    for i in l:
+  
+        x = i.strip(string.punctuation + '’ ')
+        ret.append(x)
+
+ 
+    return ret
+
+
+    
 
 class TestCases(unittest.TestCase):
 
@@ -192,8 +216,8 @@ class TestCases(unittest.TestCase):
     def test_get_book_summary(self):
         # create a local variable – summaries – a list containing the results from get_book_summary()
         # for each URL in TestCases.search_urls (should be a list of tuples)
-        pass
-        '''
+        
+        
         summaries = []
         l = get_search_links()
         for i in l:
@@ -211,7 +235,7 @@ class TestCases(unittest.TestCase):
             # check that the third element in the tuple, i.e. pages is an int
             self.assertEqual(type(i[2]), int)
             # check that the first book in the search has 337 pages
-        self.assertEqual(summaries[0][2], 337)'''
+        self.assertEqual(summaries[0][2], 337)
 
 
     def test_summarize_best_books(self):
@@ -250,7 +274,7 @@ class TestCases(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    print(extra_credit("extra_credit.htm"))
+    print(extra_credit("https://www.goodreads.com/book/show/40538681-midnight-in-chernobyl?ac=1&from_search=true&qid=Eg6a3dLI4f&rank=1"))
     unittest.main(verbosity=2)
 
 
